@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Packaging
+build/
+dist/
+*.egg-info/
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data outputs
+data/raw/**
+data/interim/**
+data/merged/**
+data/processed/**
+!data/raw/.gitkeep
+!data/raw/statcan/.gitkeep
+!data/raw/bea/.gitkeep
+!data/raw/fred/.gitkeep
+!data/raw/eurostat/.gitkeep
+!data/interim/.gitkeep
+!data/merged/.gitkeep
+!data/processed/.gitkeep
+
+# Model and report artifacts
+models/
+reports/output/
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

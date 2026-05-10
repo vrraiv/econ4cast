@@ -1,0 +1,77 @@
+# Central run configuration for data imports, nowcasts, and forecast evaluation.
+
+run:
+  forecast_date: "2026-05-10"
+  vintage_label: "initial-scaffold"
+  timezone: "America/Toronto"
+
+calendar:
+  sample_start: "1995-01-01"
+  sample_end: null
+  forecast_origin: "2026-05-10"
+  frequencies:
+    monthly: "M"
+    quarterly: "Q"
+  horizons:
+    nowcast_quarters: 1
+    short_term_quarters: 4
+    medium_term_quarters: 12
+
+geographies:
+  us:
+    name: "United States"
+    currency: "USD"
+  canada:
+    name: "Canada"
+    currency: "CAD"
+  eurozone:
+    name: "Eurozone"
+    currency: "EUR"
+
+paths:
+  raw_data: "data/raw"
+  interim_data: "data/interim"
+  merged_data: "data/merged"
+  processed_data: "data/processed"
+
+api_sources:
+  statcan:
+    enabled: true
+    raw_subdir: "statcan"
+    api_key_env: null
+    datasets: []
+  bea:
+    enabled: true
+    raw_subdir: "bea"
+    api_key_env: "BEA_API_KEY"
+    datasets: []
+  fred:
+    enabled: true
+    raw_subdir: "fred"
+    api_key_env: "FRED_API_KEY"
+    series: []
+  eurostat:
+    enabled: true
+    raw_subdir: "eurostat"
+    api_key_env: null
+    datasets: []
+
+modeling:
+  targets:
+    - real_gdp_growth
+    - inflation
+    - unemployment_rate
+  transformations:
+    default_growth_rate: "annualized_qoq"
+    default_inflation_rate: "year_over_year"
+  benchmarks:
+    - random_walk
+    - ar1
+  metrics:
+    - mae
+    - rmse
+
+output:
+  save_import_logs: true
+  save_forecast_artifacts: true
+  forecast_output_dir: "data/processed/forecasts"
