@@ -1,4 +1,16 @@
 # Federal Reserve Economic Data source catalog.
+#
+# Contract for each configured series:
+# - series_id: FRED series identifier, for example "GDPC1".
+# - name: Human-readable series label.
+# - geography: Internal geography key, for example "us".
+# - frequency: One of daily, weekly, monthly, quarterly, or annual.
+# - units: Provider-reported or intended request units.
+# - seasonal_adjustment: Seasonal adjustment metadata from the provider.
+# - observation_start: Optional YYYY-MM-DD request lower bound.
+# - transformations: Optional list of downstream transformation labels.
+#
+# api_key_env must be an uppercase environment variable name, not a key value.
 
 enabled: true
 raw_subdir: "fred"
