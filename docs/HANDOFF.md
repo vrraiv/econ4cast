@@ -17,7 +17,8 @@
 - FRED now has a validated source config contract and a dry-run importer path
   that reports planned requests without requiring or printing an API key. The
   FRED contract rejects unknown top-level source keys, known hardcoded secret
-  fields, and malformed `observation_start` values outside the documented
+  fields, `api_key_env` values that are not uppercase environment variable
+  names, and malformed `observation_start` values outside the documented
   `YYYY-MM-DD` format.
 
 ## Recent Work
@@ -35,7 +36,7 @@
 - Added FRED config-contract validation, dry-run importer behavior, and focused
   tests for malformed FRED config and API-key handling.
 - Tightened FRED config validation to reject hardcoded key fields, unknown
-  top-level source fields, and invalid `observation_start` date strings.
+  top-level source fields, invalid `api_key_env` names, and invalid `observation_start` date strings.
 
 ## Next Best Steps
 

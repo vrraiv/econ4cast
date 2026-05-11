@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from datetime import date
 from pathlib import Path
+import re
 from typing import Any
 
 import yaml
@@ -12,6 +13,7 @@ import yaml
 FRED_FREQUENCIES = {"daily", "weekly", "monthly", "quarterly", "annual"}
 FRED_TOP_LEVEL_FIELDS = {"enabled", "raw_subdir", "api_key_env", "series"}
 FRED_FORBIDDEN_SECRET_FIELDS = {"api_key", "api_key_value", "key", "token", "access_token"}
+FRED_ENV_VAR_NAME_PATTERN = re.compile(r"^[A-Z_][A-Z0-9_]*$")
 FRED_REQUIRED_SERIES_FIELDS = {
     "series_id",
     "name",
@@ -69,8 +71,11 @@ def validate_fred_source_config(source_config: dict[str, Any], label: str = "FRE
         raise ValueError(f"{label} field 'raw_subdir' must be a non-empty string.")
 
     api_key_env = source_config.get("api_key_env")
-    if not _is_non_empty_string(api_key_env):
-        raise ValueError(f"{label} field 'api_key_env' must name the environment variable.")
+    if not _is_environment_variable_name(api_key_env):
+        raise ValueError(
+            f"{label} field 'api_key_env' must be an environment variable name using only "
+            "uppercase letters, digits, and underscores, and must not start with a digit."
+        )
 
     series = source_config.get("series")
     if not isinstance(series, list):
@@ -143,6 +148,10 @@ def _validate_fred_series_config(series_config: Any, label: str) -> None:
 
 def _is_non_empty_string(value: Any) -> bool:
     return isinstance(value, str) and bool(value.strip())
+
+
+def _is_environment_variable_name(value: Any) -> bool:
+    return isinstance(value, str) and FRED_ENV_VAR_NAME_PATTERN.fullmatch(value.strip()) is not None
 
 
 def _is_yyyy_mm_dd_date(value: Any) -> bool:

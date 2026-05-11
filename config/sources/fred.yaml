@@ -9,6 +9,8 @@
 # - seasonal_adjustment: Seasonal adjustment metadata from the provider.
 # - observation_start: Optional YYYY-MM-DD request lower bound.
 # - transformations: Optional list of downstream transformation labels.
+#
+# api_key_env must be an uppercase environment variable name, not a key value.
 
 enabled: true
 raw_subdir: "fred"

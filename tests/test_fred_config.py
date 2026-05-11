@@ -27,9 +27,13 @@ def test_validate_fred_source_config_accepts_contract() -> None:
     validate_fred_source_config(_valid_fred_config())
 
 
-def test_validate_fred_source_config_requires_api_key_env_name() -> None:
+@pytest.mark.parametrize(
+    "api_key_env",
+    ["", "fred_api_key", "FRED-API-KEY", "1FRED_API_KEY", "abc123literalkey"],
+)
+def test_validate_fred_source_config_requires_api_key_env_name(api_key_env: str) -> None:
     config = _valid_fred_config()
-    config["api_key_env"] = ""
+    config["api_key_env"] = api_key_env
 
     with pytest.raises(ValueError, match="api_key_env"):
         validate_fred_source_config(config)
