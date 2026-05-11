@@ -1,0 +1,10 @@
+# Shared transformation defaults for source harmonization and model targets.
+
+defaults:
+  growth_rate: "annualized_qoq"
+  inflation_rate: "year_over_year"
+
+target_concepts:
+  - real_gdp_growth
+  - inflation
+  - unemployment_rate

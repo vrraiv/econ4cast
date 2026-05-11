@@ -13,7 +13,7 @@ def main() -> None:
     parser.add_argument("--config", default="config/forecast_config.yaml")
     args = parser.parse_args()
     config = load_config(args.config)
-    source_config = config["api_sources"]["bea"]
+    source_config = config["sources"]["bea"]
     api_key_name = source_config.get("api_key_env")
     api_key = os.getenv(api_key_name) if api_key_name else None
     datasets = source_config.get("datasets", [])

@@ -1,0 +1,10 @@
+# Eurozone real GDP forecast target.
+
+enabled: true
+economy: "eurozone"
+concept: "real_gdp_growth"
+display_name: "Eurozone real GDP growth"
+frequency: "quarterly"
+transformation: "annualized_qoq"
+primary_source: "eurostat"
+source_series: []

@@ -1,0 +1,6 @@
+# Federal Reserve Economic Data source catalog.
+
+enabled: true
+raw_subdir: "fred"
+api_key_env: "FRED_API_KEY"
+series: []

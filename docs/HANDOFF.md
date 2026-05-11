@@ -10,8 +10,10 @@
 - Forecasting helpers currently include random walk and AR(1) benchmarks plus
   MAE and RMSE evaluation metrics.
 - `config/forecast_config.yaml` defines run metadata, geographies, data paths,
-  enabled providers, target concepts, benchmark names, metrics, and output
-  locations.
+  model settings, outputs, and the modular config files to load.
+- Provider settings now live under `config/sources/`, GDP target scaffolds live
+  under `config/targets/`, and shared transformation defaults live in
+  `config/transforms.yaml`.
 
 ## Recent Work
 
@@ -23,11 +25,13 @@
   - `docs/OPEN_QUESTIONS.md`
 - Added documentation upkeep rules to `AGENTS.md`.
 - Updated the README project structure to include the docs layout.
+- Split configuration into a top-level orchestration file plus modular source,
+  target, and transform YAML files.
 
 ## Next Best Steps
 
 1. Choose the first target and source series for each economy.
-2. Fill provider series and dataset metadata in `config/forecast_config.yaml`.
+2. Fill provider series and dataset metadata in `config/sources/`.
 3. Implement one complete ingestion path end to end, including raw payload
    storage and a validation check.
 4. Promote the first cleaned provider extract into `data/interim/`.

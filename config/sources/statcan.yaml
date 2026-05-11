@@ -1,0 +1,6 @@
+# Statistics Canada source catalog.
+
+enabled: true
+raw_subdir: "statcan"
+api_key_env: null
+datasets: []

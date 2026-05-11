@@ -13,6 +13,16 @@ econ4cast/
   pyproject.toml
   config/
     forecast_config.yaml
+    transforms.yaml
+    sources/
+      fred.yaml
+      bea.yaml
+      statcan.yaml
+      eurostat.yaml
+    targets/
+      us_gdp.yaml
+      canada_gdp.yaml
+      eurozone_gdp.yaml
   data/
     raw/
     interim/
@@ -38,8 +48,13 @@ econ4cast/
 
 ## Main Components
 
-- `config/forecast_config.yaml`: Central run, source, calendar, geography,
-  modeling, and output configuration.
+- `config/forecast_config.yaml`: Top-level run, calendar, geography, modeling,
+  output, and config module orchestration.
+- `config/sources/`: Provider-specific source catalogs for StatCan, BEA, FRED,
+  and Eurostat.
+- `config/targets/`: Economy-specific forecasting target definitions.
+- `config/transforms.yaml`: Shared transformation defaults and target concept
+  names.
 - `scripts/imports/`: Provider-specific command-line import scaffolds. These
   scripts read configuration, check required environment variables, and should
   orchestrate provider clients.
@@ -60,7 +75,8 @@ econ4cast/
 ## Data Flow
 
 1. Define source series, provider identifiers, geography, frequency, units, and
-   transformations in `config/forecast_config.yaml` and catalog structures.
+   transformations in the modular files referenced by
+   `config/forecast_config.yaml`.
 2. Run provider import scripts in `scripts/imports/`.
 3. Store direct API payloads under `data/raw/<provider>/`.
 4. Build provider-specific cleaned extracts in `data/interim/`.

@@ -12,7 +12,7 @@ def main() -> None:
     parser.add_argument("--config", default="config/forecast_config.yaml")
     args = parser.parse_args()
     config = load_config(args.config)
-    datasets = config["api_sources"]["eurostat"].get("datasets", [])
+    datasets = config["sources"]["eurostat"].get("datasets", [])
     print(f"Eurostat import scaffold loaded {len(datasets)} configured dataset(s).")
 
 

@@ -12,7 +12,7 @@ def main() -> None:
     parser.add_argument("--config", default="config/forecast_config.yaml")
     args = parser.parse_args()
     config = load_config(args.config)
-    datasets = config["api_sources"]["statcan"].get("datasets", [])
+    datasets = config["sources"]["statcan"].get("datasets", [])
     print(f"StatCan import scaffold loaded {len(datasets)} configured dataset(s).")
 
 

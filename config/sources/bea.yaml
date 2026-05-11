@@ -1,0 +1,6 @@
+# Bureau of Economic Analysis source catalog.
+
+enabled: true
+raw_subdir: "bea"
+api_key_env: "BEA_API_KEY"
+datasets: []

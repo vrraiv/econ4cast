@@ -5,7 +5,8 @@
 - Select first forecasting targets for each economy.
 - Record provider table IDs, series IDs, geographies, frequencies, units,
   transformations, and release calendar assumptions.
-- Fill `config/forecast_config.yaml` with the selected source series.
+- Fill `config/sources/` and `config/targets/` with the selected source series
+  and forecasting targets.
 
 ## Phase 2: Reproducible Ingestion
 

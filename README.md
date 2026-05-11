@@ -12,6 +12,16 @@ econ4cast/
   pyproject.toml
   config/
     forecast_config.yaml
+    transforms.yaml
+    sources/
+      bea.yaml
+      eurostat.yaml
+      fred.yaml
+      statcan.yaml
+    targets/
+      canada_gdp.yaml
+      eurozone_gdp.yaml
+      us_gdp.yaml
   data/
     raw/
       statcan/
@@ -98,5 +108,6 @@ python scripts/imports/import_eurostat.py --config config/forecast_config.yaml
 ```
 
 The import scripts are intentionally light scaffolds. The next step is to fill
-the source catalog in `config/forecast_config.yaml` with the exact API datasets,
-series IDs, and transformations needed for the first forecasting target.
+the source catalog in `config/sources/` and target catalog in `config/targets/`
+with the exact API datasets, series IDs, and transformations needed for the
+first forecasting targets.

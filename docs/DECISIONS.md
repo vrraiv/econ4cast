@@ -37,6 +37,16 @@ comparability.
 - Rationale: More complex nowcasting and medium-term models need simple,
   reproducible comparisons before they can be evaluated credibly.
 
+### Split Configuration Into Modular Catalogs
+
+- Date: 2026-05-11
+- Decision: Keep `config/forecast_config.yaml` as the top-level orchestration
+  file and split provider sources, forecast targets, and shared transformations
+  into `config/sources/`, `config/targets/`, and `config/transforms.yaml`.
+- Rationale: Source metadata, target definitions, and transformation defaults
+  will grow at different rates, so separate files keep updates reviewable while
+  preserving one config entry point for scripts.
+
 ## Proposed
 
 - Define a stable schema for source catalog entries and merged panel columns.

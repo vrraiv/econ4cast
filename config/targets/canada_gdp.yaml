@@ -1,0 +1,10 @@
+# Canada real GDP forecast target.
+
+enabled: true
+economy: "canada"
+concept: "real_gdp_growth"
+display_name: "Canada real GDP growth"
+frequency: "quarterly"
+transformation: "annualized_qoq"
+primary_source: "statcan"
+source_series: []

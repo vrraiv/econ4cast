@@ -1,0 +1,10 @@
+# United States real GDP forecast target.
+
+enabled: true
+economy: "us"
+concept: "real_gdp_growth"
+display_name: "United States real GDP growth"
+frequency: "quarterly"
+transformation: "annualized_qoq"
+primary_source: "bea"
+source_series: []

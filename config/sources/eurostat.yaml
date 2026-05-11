@@ -1,0 +1,6 @@
+# Eurostat source catalog.
+
+enabled: true
+raw_subdir: "eurostat"
+api_key_env: null
+datasets: []
