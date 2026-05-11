@@ -39,6 +39,43 @@
   top-level source fields, invalid `api_key_env` names, invalid `observation_start` date strings,
   series-level secret fields, and unknown per-series fields.
 
+## Session Update - 2026-05-10 (PR #2)
+
+### What Was Done
+
+- Set up the FRED source configuration contract for runtime API-key lookup and
+  per-series metadata validation.
+- Added FRED dry-run importer behavior that validates configured series, reports
+  planned requests, and avoids requiring or printing an API key during dry runs.
+- Added non-dry-run API-key presence checks while leaving provider downloads
+  intentionally unimplemented until approved source series are finalized.
+- Added focused tests for FRED config validation, importer dry-run behavior,
+  malformed source metadata, and API-key handling.
+- Documented the FRED source configuration contract in the README and recorded
+  the validation decision in `docs/DECISIONS.md`.
+
+### Files Changed
+
+- `README.md`: Documented the FRED dry-run command and source configuration
+  contract.
+- `config/sources/fred.yaml`: Added contract comments and `api_key_env` runtime
+  key lookup metadata.
+- `docs/DECISIONS.md`: Recorded the FRED source contract validation decision.
+- `docs/HANDOFF.md`: Added the FRED current-state and recent-work notes.
+- `scripts/imports/import_fred.py`: Added dry-run handling, config validation,
+  API-key checks, and planned-series output.
+- `src/econ4cast/config.py`: Added FRED source and series validation helpers.
+- `tests/test_fred_config.py`: Added FRED config-contract tests.
+- `tests/test_import_fred.py`: Added FRED importer behavior tests.
+
+### Follow-Up Notes
+
+- The PR did not implement actual FRED payload downloads; the next ingestion
+  step remains selecting approved source series and persisting raw payloads under
+  `data/raw/fred/`.
+- PR #2 was merged on 2026-05-11, but most implementation commits were authored
+  on 2026-05-10.
+
 ## Session Update - 2026-05-11
 
 ### What Was Done This Session
