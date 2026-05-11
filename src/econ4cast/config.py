@@ -20,6 +20,8 @@ FRED_REQUIRED_SERIES_FIELDS = {
     "units",
     "seasonal_adjustment",
 }
+FRED_OPTIONAL_SERIES_FIELDS = {"observation_start", "transformations"}
+FRED_SERIES_FIELDS = FRED_REQUIRED_SERIES_FIELDS | FRED_OPTIONAL_SERIES_FIELDS
 
 
 def load_config(path: str | Path = "config/forecast_config.yaml") -> dict[str, Any]:
@@ -115,6 +117,19 @@ def _validate_loaded_config(config: dict[str, Any]) -> None:
 def _validate_fred_series_config(series_config: Any, label: str) -> None:
     if not isinstance(series_config, dict):
         raise TypeError(f"{label} must be a mapping.")
+
+    extra_fields = sorted(set(series_config) - FRED_SERIES_FIELDS)
+    forbidden_fields = sorted(FRED_FORBIDDEN_SECRET_FIELDS & set(series_config))
+    if forbidden_fields:
+        fields = ", ".join(forbidden_fields)
+        raise ValueError(
+            f"{label} must not contain hardcoded secret field(s): {fields}. "
+            "Series entries must only contain request metadata."
+        )
+    if extra_fields:
+        fields = ", ".join(extra_fields)
+        allowed = ", ".join(sorted(FRED_SERIES_FIELDS))
+        raise ValueError(f"{label} contains unknown field(s): {fields}. Allowed fields: {allowed}.")
 
     missing_fields = sorted(FRED_REQUIRED_SERIES_FIELDS - set(series_config))
     if missing_fields:

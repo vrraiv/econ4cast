@@ -67,6 +67,22 @@ def test_validate_fred_source_config_rejects_unknown_top_level_fields() -> None:
         validate_fred_source_config(config)
 
 
+def test_validate_fred_source_config_rejects_series_hardcoded_api_key_field() -> None:
+    config = _valid_fred_config()
+    config["series"][0]["token"] = "not-a-real-token"
+
+    with pytest.raises(ValueError, match="hardcoded secret"):
+        validate_fred_source_config(config)
+
+
+def test_validate_fred_source_config_rejects_unknown_series_fields() -> None:
+    config = _valid_fred_config()
+    config["series"][0]["unexpected"] = "value"
+
+    with pytest.raises(ValueError, match="unknown field"):
+        validate_fred_source_config(config)
+
+
 @pytest.mark.parametrize(
     "observation_start",
     ["1995", "1995/01/01", "yesterday", "2024-2-03", "2024-02-30"],
