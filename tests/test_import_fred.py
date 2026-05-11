@@ -1,9 +1,21 @@
+import importlib.util
 from pathlib import Path
 
 import pytest
 import yaml
 
-from scripts.imports.import_fred import run_import
+
+def _load_run_import():
+    module_path = Path(__file__).resolve().parents[1] / "scripts" / "imports" / "import_fred.py"
+    spec = importlib.util.spec_from_file_location("import_fred", module_path)
+    assert spec is not None
+    assert spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.run_import
+
+
+run_import = _load_run_import()
 
 
 def _write_config(tmp_path: Path) -> Path:
