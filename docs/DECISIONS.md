@@ -53,3 +53,13 @@ comparability.
 - Decide how to represent vintages and release calendars.
 - Decide whether forecast artifacts are file-based outputs, database tables, or
   both.
+
+### Validate the FRED Source Contract Before Import
+
+- Date: 2026-05-11
+- Decision: `config/sources/fred.yaml` must define runtime key lookup metadata
+  and a validated per-series metadata contract before FRED import orchestration
+  can run.
+- Rationale: The first provider-specific config contract should prevent
+  malformed source entries and keep API keys in environment variables rather
+  than committed YAML files.

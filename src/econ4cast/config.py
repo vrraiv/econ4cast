@@ -1,4 +1,4 @@
-"""Configuration loading helpers."""
+"""Configuration loading and validation helpers."""
 
 from __future__ import annotations
 
@@ -6,6 +6,17 @@ from pathlib import Path
 from typing import Any
 
 import yaml
+
+
+FRED_FREQUENCIES = {"daily", "weekly", "monthly", "quarterly", "annual"}
+FRED_REQUIRED_SERIES_FIELDS = {
+    "series_id",
+    "name",
+    "geography",
+    "frequency",
+    "units",
+    "seasonal_adjustment",
+}
 
 
 def load_config(path: str | Path = "config/forecast_config.yaml") -> dict[str, Any]:
@@ -17,9 +28,40 @@ def load_config(path: str | Path = "config/forecast_config.yaml") -> dict[str, A
     _resolve_named_modules(config, "sources", base_dir)
     _resolve_named_modules(config, "targets", base_dir)
     _resolve_single_module(config, "transforms", base_dir)
+    _validate_loaded_config(config)
     _add_compatibility_aliases(config)
 
     return config
+
+
+def validate_fred_source_config(source_config: dict[str, Any], label: str = "FRED source config") -> None:
+    """Validate the repository's FRED source configuration contract.
+
+    The contract intentionally covers metadata and importer control fields only.
+    It does not require an API key value because secrets must be supplied through
+    the environment at runtime.
+    """
+    if not isinstance(source_config, dict):
+        raise TypeError(f"{label} must be a mapping.")
+
+    enabled = source_config.get("enabled")
+    if not isinstance(enabled, bool):
+        raise TypeError(f"{label} field 'enabled' must be a boolean.")
+
+    raw_subdir = source_config.get("raw_subdir")
+    if not _is_non_empty_string(raw_subdir):
+        raise ValueError(f"{label} field 'raw_subdir' must be a non-empty string.")
+
+    api_key_env = source_config.get("api_key_env")
+    if not _is_non_empty_string(api_key_env):
+        raise ValueError(f"{label} field 'api_key_env' must name the environment variable.")
+
+    series = source_config.get("series")
+    if not isinstance(series, list):
+        raise TypeError(f"{label} field 'series' must be a list.")
+
+    for index, series_config in enumerate(series):
+        _validate_fred_series_config(series_config, f"{label} series[{index}]")
 
 
 def _load_yaml(path: Path) -> dict[str, Any]:
@@ -45,6 +87,46 @@ def _resolve_single_module(config: dict[str, Any], key: str, base_dir: Path) -> 
     module_path = config.get(key)
     if isinstance(module_path, str):
         config[key] = _load_yaml(base_dir / module_path)
+
+
+def _validate_loaded_config(config: dict[str, Any]) -> None:
+    sources = config.get("sources")
+    if not isinstance(sources, dict) or "fred" not in sources:
+        return
+    validate_fred_source_config(sources["fred"])
+
+
+def _validate_fred_series_config(series_config: Any, label: str) -> None:
+    if not isinstance(series_config, dict):
+        raise TypeError(f"{label} must be a mapping.")
+
+    missing_fields = sorted(FRED_REQUIRED_SERIES_FIELDS - set(series_config))
+    if missing_fields:
+        missing = ", ".join(missing_fields)
+        raise ValueError(f"{label} is missing required field(s): {missing}.")
+
+    for field in sorted(FRED_REQUIRED_SERIES_FIELDS):
+        if not _is_non_empty_string(series_config.get(field)):
+            raise ValueError(f"{label} field '{field}' must be a non-empty string.")
+
+    frequency = series_config["frequency"]
+    if frequency not in FRED_FREQUENCIES:
+        allowed = ", ".join(sorted(FRED_FREQUENCIES))
+        raise ValueError(f"{label} field 'frequency' must be one of: {allowed}.")
+
+    observation_start = series_config.get("observation_start")
+    if observation_start is not None and not _is_non_empty_string(observation_start):
+        raise ValueError(f"{label} field 'observation_start' must be a non-empty string.")
+
+    transformations = series_config.get("transformations", [])
+    if not isinstance(transformations, list) or not all(
+        _is_non_empty_string(transformation) for transformation in transformations
+    ):
+        raise TypeError(f"{label} field 'transformations' must be a list of non-empty strings.")
+
+
+def _is_non_empty_string(value: Any) -> bool:
+    return isinstance(value, str) and bool(value.strip())
 
 
 def _add_compatibility_aliases(config: dict[str, Any]) -> None:

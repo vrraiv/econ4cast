@@ -101,13 +101,34 @@ require them.
 ## First Commands
 
 ```powershell
-python scripts/imports/import_fred.py --config config/forecast_config.yaml
+python scripts/imports/import_fred.py --config config/forecast_config.yaml --dry-run
 python scripts/imports/import_bea.py --config config/forecast_config.yaml
 python scripts/imports/import_statcan.py --config config/forecast_config.yaml
 python scripts/imports/import_eurostat.py --config config/forecast_config.yaml
 ```
 
-The import scripts are intentionally light scaffolds. The next step is to fill
-the source catalog in `config/sources/` and target catalog in `config/targets/`
-with the exact API datasets, series IDs, and transformations needed for the
-first forecasting targets.
+The FRED importer currently supports a config-validation dry run. A non-dry-run
+FRED import requires `FRED_API_KEY` in the environment, validates that it is
+present, and intentionally stops before downloading data while the source
+catalog is still being defined.
+
+## FRED Source Configuration
+
+`config/sources/fred.yaml` defines the repository contract for FRED metadata and
+runtime key lookup. Keep real API keys out of the file; set `FRED_API_KEY` in
+the environment or in an uncommitted `.env` file instead. Each configured FRED
+series must include:
+
+- `series_id`: FRED series identifier, for example `GDPC1`.
+- `name`: Human-readable label.
+- `geography`: Internal geography key such as `us`.
+- `frequency`: One of `daily`, `weekly`, `monthly`, `quarterly`, or `annual`.
+- `units`: Provider-reported or intended request units.
+- `seasonal_adjustment`: Seasonal adjustment metadata from FRED.
+- `observation_start`: Optional `YYYY-MM-DD` request lower bound.
+- `transformations`: Optional downstream transformation labels.
+
+The remaining import scripts are intentionally light scaffolds. The next step is
+to fill the source catalog in `config/sources/` and target catalog in
+`config/targets/` with the exact API datasets, series IDs, and transformations
+needed for the first forecasting targets.

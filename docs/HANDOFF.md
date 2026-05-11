@@ -14,6 +14,8 @@
 - Provider settings now live under `config/sources/`, GDP target scaffolds live
   under `config/targets/`, and shared transformation defaults live in
   `config/transforms.yaml`.
+- FRED now has a validated source config contract and a dry-run importer path
+  that reports planned requests without requiring or printing an API key.
 
 ## Recent Work
 
@@ -27,13 +29,15 @@
 - Updated the README project structure to include the docs layout.
 - Split configuration into a top-level orchestration file plus modular source,
   target, and transform YAML files.
+- Added FRED config-contract validation, dry-run importer behavior, and focused
+  tests for malformed FRED config and API-key handling.
 
 ## Next Best Steps
 
 1. Choose the first target and source series for each economy.
 2. Fill provider series and dataset metadata in `config/sources/`.
-3. Implement one complete ingestion path end to end, including raw payload
-   storage and a validation check.
+3. Implement the FRED download path after the source catalog contains approved
+   series; preserve raw payloads under `data/raw/fred/`.
 4. Promote the first cleaned provider extract into `data/interim/`.
 5. Define the merged panel schema before building cross-economy joins.
 
