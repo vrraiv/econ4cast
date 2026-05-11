@@ -39,6 +39,39 @@
   top-level source fields, invalid `api_key_env` names, invalid `observation_start` date strings,
   series-level secret fields, and unknown per-series fields.
 
+## Session Update - 2026-05-11
+
+### What Was Done This Session
+
+- Refreshed the handoff document so the next agent has an explicit session
+  summary, changed-file list, recommended restart point, and risk register.
+- No source code, configuration, ingestion, modeling, or architecture changes were
+  made in this documentation-only session.
+
+### Files Changed This Session
+
+- `docs/HANDOFF.md`: Added this dated session update with completed work, next
+  steps, and risks introduced today.
+
+### Where Next Session Should Start
+
+1. Confirm the exact provider series or tables for the first GDP target in each
+   economy.
+2. Update the relevant source and target YAML files once the provider metadata is
+   confirmed.
+3. Implement the first complete provider ingestion path, including raw payload
+   persistence under `data/raw/<provider>/` and a basic validation check.
+4. Revisit the merged panel schema before creating cross-economy joins.
+
+### Risks Introduced Today
+
+- This update is documentation-only and does not validate ingestion, forecasting,
+  or configuration behavior.
+- The next-step recommendations still depend on unresolved source-series and
+  merged-panel schema decisions in `docs/OPEN_QUESTIONS.md`.
+- Because no provider payloads were downloaded or tested, API availability,
+  authentication requirements, and response-shape assumptions remain unverified.
+
 ## Next Best Steps
 
 1. Choose the first target and source series for each economy.
