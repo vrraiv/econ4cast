@@ -21,6 +21,12 @@ econ4cast/
     interim/
     merged/
     processed/
+  docs/
+    ARCHITECTURE.md
+    DECISIONS.md
+    HANDOFF.md
+    OPEN_QUESTIONS.md
+    ROADMAP.md
   notebooks/
   scripts/
     imports/

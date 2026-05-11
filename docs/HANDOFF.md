@@ -1,0 +1,41 @@
+# Handoff
+
+## Current State
+
+- The repository is an initial scaffold for macroeconomic forecasting across the
+  United States, Canada, and the eurozone.
+- Provider API helper modules exist for StatCan, BEA, FRED, and Eurostat.
+- Import scripts currently load configuration and report scaffold status; full
+  provider ingestion still needs implementation.
+- Forecasting helpers currently include random walk and AR(1) benchmarks plus
+  MAE and RMSE evaluation metrics.
+- `config/forecast_config.yaml` defines run metadata, geographies, data paths,
+  enabled providers, target concepts, benchmark names, metrics, and output
+  locations.
+
+## Recent Work
+
+- Added the documentation layout:
+  - `docs/ARCHITECTURE.md`
+  - `docs/ROADMAP.md`
+  - `docs/DECISIONS.md`
+  - `docs/HANDOFF.md`
+  - `docs/OPEN_QUESTIONS.md`
+- Added documentation upkeep rules to `AGENTS.md`.
+- Updated the README project structure to include the docs layout.
+
+## Next Best Steps
+
+1. Choose the first target and source series for each economy.
+2. Fill provider series and dataset metadata in `config/forecast_config.yaml`.
+3. Implement one complete ingestion path end to end, including raw payload
+   storage and a validation check.
+4. Promote the first cleaned provider extract into `data/interim/`.
+5. Define the merged panel schema before building cross-economy joins.
+
+## Working Notes
+
+- Do not commit downloaded data, API keys, model artifacts, virtual
+  environments, or notebook checkpoints.
+- Update this file after meaningful implementation work so the next agent can
+  resume from the current project state.
