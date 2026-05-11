@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import date
 from pathlib import Path
 from typing import Any
 
@@ -9,6 +10,8 @@ import yaml
 
 
 FRED_FREQUENCIES = {"daily", "weekly", "monthly", "quarterly", "annual"}
+FRED_TOP_LEVEL_FIELDS = {"enabled", "raw_subdir", "api_key_env", "series"}
+FRED_FORBIDDEN_SECRET_FIELDS = {"api_key", "api_key_value", "key", "token", "access_token"}
 FRED_REQUIRED_SERIES_FIELDS = {
     "series_id",
     "name",
@@ -43,6 +46,19 @@ def validate_fred_source_config(source_config: dict[str, Any], label: str = "FRE
     """
     if not isinstance(source_config, dict):
         raise TypeError(f"{label} must be a mapping.")
+
+    extra_fields = sorted(set(source_config) - FRED_TOP_LEVEL_FIELDS)
+    forbidden_fields = sorted(FRED_FORBIDDEN_SECRET_FIELDS & set(source_config))
+    if forbidden_fields:
+        fields = ", ".join(forbidden_fields)
+        raise ValueError(
+            f"{label} must not contain hardcoded secret field(s): {fields}. "
+            "Use 'api_key_env' to name the runtime environment variable."
+        )
+    if extra_fields:
+        fields = ", ".join(extra_fields)
+        allowed = ", ".join(sorted(FRED_TOP_LEVEL_FIELDS))
+        raise ValueError(f"{label} contains unknown top-level field(s): {fields}. Allowed fields: {allowed}.")
 
     enabled = source_config.get("enabled")
     if not isinstance(enabled, bool):
@@ -115,8 +131,8 @@ def _validate_fred_series_config(series_config: Any, label: str) -> None:
         raise ValueError(f"{label} field 'frequency' must be one of: {allowed}.")
 
     observation_start = series_config.get("observation_start")
-    if observation_start is not None and not _is_non_empty_string(observation_start):
-        raise ValueError(f"{label} field 'observation_start' must be a non-empty string.")
+    if observation_start is not None and not _is_yyyy_mm_dd_date(observation_start):
+        raise ValueError(f"{label} field 'observation_start' must be a YYYY-MM-DD date string.")
 
     transformations = series_config.get("transformations", [])
     if not isinstance(transformations, list) or not all(
@@ -127,6 +143,16 @@ def _validate_fred_series_config(series_config: Any, label: str) -> None:
 
 def _is_non_empty_string(value: Any) -> bool:
     return isinstance(value, str) and bool(value.strip())
+
+
+def _is_yyyy_mm_dd_date(value: Any) -> bool:
+    if not _is_non_empty_string(value):
+        return False
+    try:
+        parsed_date = date.fromisoformat(value)
+    except ValueError:
+        return False
+    return value == parsed_date.isoformat()
 
 
 def _add_compatibility_aliases(config: dict[str, Any]) -> None:

@@ -49,3 +49,31 @@ def test_validate_fred_source_config_rejects_unknown_frequency() -> None:
 
     with pytest.raises(ValueError, match="frequency"):
         validate_fred_source_config(config)
+
+
+def test_validate_fred_source_config_rejects_hardcoded_api_key_field() -> None:
+    config = _valid_fred_config()
+    config["api_key"] = "not-a-real-key"
+
+    with pytest.raises(ValueError, match="hardcoded secret"):
+        validate_fred_source_config(config)
+
+
+def test_validate_fred_source_config_rejects_unknown_top_level_fields() -> None:
+    config = _valid_fred_config()
+    config["unexpected"] = "value"
+
+    with pytest.raises(ValueError, match="unknown top-level field"):
+        validate_fred_source_config(config)
+
+
+@pytest.mark.parametrize(
+    "observation_start",
+    ["1995", "1995/01/01", "yesterday", "2024-2-03", "2024-02-30"],
+)
+def test_validate_fred_source_config_rejects_malformed_observation_start(observation_start: str) -> None:
+    config = _valid_fred_config()
+    config["series"][0]["observation_start"] = observation_start
+
+    with pytest.raises(ValueError, match="observation_start"):
+        validate_fred_source_config(config)
