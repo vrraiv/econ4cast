@@ -1,4 +1,4 @@
-"""Validate and dry-run FRED source data imports."""
+"""Import raw FRED source data payloads."""
 
 from __future__ import annotations
 
@@ -12,6 +12,8 @@ SRC_DIR = Path(__file__).resolve().parents[2] / "src"
 if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
+from econ4cast.api_clients.base import write_json  # noqa: E402
+from econ4cast.api_clients.fred import get_series_observations  # noqa: E402
 from econ4cast.config import load_config, validate_fred_source_config  # noqa: E402
 
 
@@ -28,12 +30,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def run_import(config_path: str, *, dry_run: bool = False) -> int:
-    """Run FRED import orchestration.
-
-    The current issue scope is limited to configuration validation and dry-run
-    behavior. Non-dry-run execution checks that the configured API key is present
-    but intentionally does not download provider data yet.
-    """
+    """Run FRED raw import orchestration."""
     config = load_config(config_path)
     source_config = config["sources"]["fred"]
     validate_fred_source_config(source_config)
@@ -62,10 +59,19 @@ def run_import(config_path: str, *, dry_run: bool = False) -> int:
             f"FRED API key is required for non-dry-run imports. Set {api_key_name} in the environment."
         )
 
-    print(
-        "FRED config validated and API key is available; "
-        "data download is intentionally not implemented in this config-contract change."
-    )
+    raw_dir = _raw_output_dir(config, source_config)
+    print(f"FRED config validated and API key is available; importing {len(series)} series.")
+    for series_config in series:
+        series_id = series_config["series_id"]
+        payload = get_series_observations(
+            api_key,
+            series_id,
+            observation_start=series_config.get("observation_start"),
+        )
+        output_path = _raw_output_path(raw_dir, series_id)
+        write_json(payload, output_path)
+        print(f"Saved raw FRED response for {series_id} to {output_path}.")
+
     return 0
 
 
@@ -74,6 +80,24 @@ def _format_planned_series(series_config: dict[str, Any]) -> str:
     frequency = series_config["frequency"]
     observation_start = series_config.get("observation_start", "provider default")
     return f"Would request FRED series {series_id} ({frequency}) from {observation_start}."
+
+
+def _raw_output_dir(config: dict[str, Any], source_config: dict[str, Any]) -> Path:
+    paths_config = config.get("paths", {})
+    raw_data_dir = (
+        paths_config.get("raw_data", "data/raw")
+        if isinstance(paths_config, dict)
+        else "data/raw"
+    )
+    return Path(raw_data_dir) / source_config["raw_subdir"]
+
+
+def _raw_output_path(raw_dir: Path, series_id: str) -> Path:
+    safe_series_id = "".join(
+        character if character.isalnum() or character in "-_" else "_"
+        for character in series_id
+    )
+    return raw_dir / f"{safe_series_id}_observations.json"
 
 
 def main() -> None:

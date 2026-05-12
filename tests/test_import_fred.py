@@ -1,21 +1,23 @@
 import importlib.util
+import json
 from pathlib import Path
 
 import pytest
 import yaml
 
 
-def _load_run_import():
+def _load_import_module():
     module_path = Path(__file__).resolve().parents[1] / "scripts" / "imports" / "import_fred.py"
     spec = importlib.util.spec_from_file_location("import_fred", module_path)
     assert spec is not None
     assert spec.loader is not None
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    return module.run_import
+    return module
 
 
-run_import = _load_run_import()
+import_fred = _load_import_module()
+run_import = import_fred.run_import
 
 
 def _write_config(tmp_path: Path) -> Path:
@@ -47,6 +49,7 @@ def _write_config(tmp_path: Path) -> Path:
     config_path.write_text(
         yaml.safe_dump(
             {
+                "paths": {"raw_data": str(tmp_path / "raw")},
                 "sources": {"fred": "sources/fred.yaml"},
                 "modeling": {},
             }
@@ -76,15 +79,39 @@ def test_fred_non_dry_run_requires_api_key(tmp_path: Path, monkeypatch) -> None:
         run_import(str(config_path), dry_run=False)
 
 
-def test_fred_non_dry_run_accepts_api_key_without_printing_secret(
+def test_fred_non_dry_run_fetches_and_saves_raw_payload_without_printing_secret(
     tmp_path: Path, monkeypatch, capsys
 ) -> None:
     config_path = _write_config(tmp_path)
     monkeypatch.setenv("FRED_API_KEY", "super-secret-test-key")
+    calls = []
+
+    def fake_get_series_observations(api_key: str, series_id: str, **params):
+        calls.append({"api_key": api_key, "series_id": series_id, "params": params})
+        return {
+            "realtime_start": "2026-05-12",
+            "realtime_end": "2026-05-12",
+            "observation_start": "1995-01-01",
+            "observations": [{"date": "1995-01-01", "value": "1.0"}],
+        }
+
+    monkeypatch.setattr(import_fred, "get_series_observations", fake_get_series_observations)
 
     exit_code = run_import(str(config_path), dry_run=False)
 
     captured = capsys.readouterr()
+    raw_payload_path = tmp_path / "raw" / "fred" / "GDPC1_observations.json"
     assert exit_code == 0
+    assert calls == [
+        {
+            "api_key": "super-secret-test-key",
+            "series_id": "GDPC1",
+            "params": {"observation_start": "1995-01-01"},
+        }
+    ]
+    assert json.loads(raw_payload_path.read_text(encoding="utf-8"))["observations"] == [
+        {"date": "1995-01-01", "value": "1.0"}
+    ]
     assert "super-secret-test-key" not in captured.out
     assert "API key is available" in captured.out
+    assert "GDPC1_observations.json" in captured.out
