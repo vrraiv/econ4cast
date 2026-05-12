@@ -109,6 +109,41 @@
 - Because no provider payloads were downloaded or tested, API availability,
   authentication requirements, and response-shape assumptions remain unverified.
 
+## Session Update - 2026-05-12
+
+### What Was Done This Session
+
+- Implemented the FRED raw import path for configured series using the existing
+  `api_key_env`, `raw_subdir`, and per-series metadata contract.
+- Added a focused FRED API client helper for the `series/observations` endpoint
+  that returns provider-shaped JSON without normalization.
+- Updated the FRED import script so non-dry-run execution fetches each
+  configured series and writes the direct raw JSON response under the configured
+  raw data directory and FRED subdirectory.
+- Added mocked tests for FRED client request construction and importer raw JSON
+  persistence without live network access or committed secrets.
+
+### Files Changed This Session
+
+- `src/econ4cast/api_clients/fred.py`: Added typed request construction for raw
+  FRED observations JSON.
+- `scripts/imports/import_fred.py`: Replaced the previous non-download path with
+  raw response fetching and JSON persistence.
+- `tests/test_fred_client.py`: Added mocked API-client tests.
+- `tests/test_import_fred.py`: Added mocked importer coverage for raw payload
+  writes and secret-safe output.
+- `docs/HANDOFF.md`: Added this session update.
+
+### Follow-Up Notes
+
+- The FRED importer still depends on approved configured series;
+  `config/sources/fred.yaml` remains empty by default.
+- Raw file naming currently uses one latest-response file per series
+  (`<series_id>_observations.json`). Vintage-aware raw output naming remains an
+  open design question.
+- No normalization, harmonization, modeling, visualization, or non-FRED provider
+  work was added.
+
 ## Next Best Steps
 
 1. Choose the first target and source series for each economy.
